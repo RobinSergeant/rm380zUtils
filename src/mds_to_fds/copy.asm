@@ -95,8 +95,7 @@ loopr:  ld bc, (dma_buffer)         ; set DMA buffer
         ld a, 17                    ; check for track rollover (16 sectors per track)
         cp (hl)
         jr nz, nextr
-        ld hl, 1                    ; rollover (reset sector count and increase track count)
-        ld (current_sector), hl
+        ld (hl), 1                  ; rollover (reset sector count and increase track count)
         ld hl, current_track
         inc (hl)
 nextr:  ld hl, sectors_left         ; check if there are any more sectors to read
@@ -114,10 +113,10 @@ nextr:  ld hl, sectors_left         ; check if there are any more sectors to rea
         ld a, 36                    ; 36 sectors need to be copied
         ld (sectors_left), a
 
-        ld hl, 0                    ; reset track, sector and buffer positions
-        ld (current_track), hl
-        ld hl, 1
-        ld (current_sector), hl
+        xor a                       ; reset track, sector and buffer positions
+        ld (current_track), a
+        inc a
+        ld (current_sector), a
         ld hl, 0x1000
         ld (dma_buffer), hl
 
@@ -150,8 +149,7 @@ loopw:  ld bc, (dma_buffer)         ; now repeat the loop to write back the data
         ld a, 27                    ; check for track rollover (now 26 sectors per track)
         cp (hl)
         jr nz, nextw
-        ld hl, 1
-        ld (current_sector), hl
+        ld (hl), 1
         ld hl, current_track
         inc (hl)
 nextw:  ld hl, sectors_left         ; check if there are any more sectors to write
